@@ -1,0 +1,54 @@
+#!/bin/zsh
+
+set -u
+SCRIPT_DIR="${0:A:h}"
+source "$SCRIPT_DIR/../lib/common.sh"
+
+cmd="${1:-help}"
+shift 2>/dev/null || true
+
+case "$cmd" in
+  transcribe)
+    exec "$SCRIPT_DIR/transcribe.sh" "$@"
+    ;;
+  scan)
+    exec "$SCRIPT_DIR/scan.sh"
+    ;;
+  status)
+    load_config || exit 1
+    print "WhisperDrop"
+    print "  Watch folder : $WATCH_DIR"
+    print "  Model        : $MODEL_PATH"
+    print "  Language     : $LANGUAGE"
+    print "  Summary      : $SUMMARY_PROVIDER"
+    if launchctl print "gui/$(id -u)/com.whisperdrop.watcher" >/dev/null 2>&1; then
+      print "  Watcher      : running"
+    else
+      print "  Watcher      : stopped"
+    fi
+    ;;
+  logs)
+    mkdir -p "$WD_LOG_DIR"
+    touch "$WD_LOG_DIR/whisperdrop.log"
+    tail -n 80 -f "$WD_LOG_DIR/whisperdrop.log"
+    ;;
+  doctor)
+    exec "$SCRIPT_DIR/../scripts/doctor.sh"
+    ;;
+  help|--help|-h)
+    cat <<'TXT'
+WhisperDrop
+
+Commands:
+  whisperdrop transcribe <file> [...]  Transcribe one or more files
+  whisperdrop scan                   Scan the watched folder now
+  whisperdrop status                 Show configuration and watcher status
+  whisperdrop logs                   Follow logs
+  whisperdrop doctor                 Run diagnostics
+TXT
+    ;;
+  *)
+    print -u2 "Unknown command: $cmd"
+    exit 2
+    ;;
+esac

@@ -1,0 +1,36 @@
+# WhisperDrop configuration
+# Copy to: ~/.config/whisperdrop/config
+
+# Folder watched for new audio files.
+WATCH_DIR="$HOME/Documents/WhatsApp Audios"
+
+# Whisper model. Installer downloads this file by default.
+MODEL_NAME="ggml-large-v3-turbo.bin"
+MODEL_PATH="$HOME/.local/share/whisperdrop/models/$MODEL_NAME"
+
+# Language: fr, en, ar, auto, etc.
+LANGUAGE="fr"
+
+# Create transcript next to audio file.
+CREATE_TRANSCRIPT="true"
+
+# Optional AI summary via macOS Shortcuts.
+# Set SUMMARY_PROVIDER="shortcuts" to enable.
+SUMMARY_PROVIDER="none"
+SHORTCUT_NAME="Résumer vocal avec ChatGPT"
+
+# Move original audio after successful transcription.
+ARCHIVE_AUDIO="false"
+ARCHIVE_DIR="$WATCH_DIR/Traités"
+
+# Notifications at the end of processing.
+NOTIFICATIONS="true"
+
+# Extensions accepted (space-separated, lowercase).
+SUPPORTED_EXTENSIONS="opus mp3 m4a wav mp4 mov aac ogg flac webm"
+
+# How long to wait before reading a newly downloaded file.
+SETTLE_SECONDS="2"
+
+# Number of whisper.cpp threads. "auto" uses half of available logical CPUs.
+THREADS="auto"

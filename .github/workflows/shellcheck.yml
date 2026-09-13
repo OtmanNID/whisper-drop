@@ -1,0 +1,13 @@
+name: shell checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  syntax:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax checks
+        run: ./tests/smoke-test.sh
