@@ -24,14 +24,65 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
   exit 1
 fi
 
+setup_brew_path() {
+  if command -v brew >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if [[ -x "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x "/usr/local/bin/brew" ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+}
+
+setup_brew_path
+
 if ! command -v brew >/dev/null 2>&1; then
-  print "Homebrew is required. Install it first from https://brew.sh then rerun this installer."
-  exit 1
+  print "Homebrew is not installed on this Mac."
+  print ""
+  print "WhisperDrop uses Homebrew to install:"
+  print "  • FFmpeg"
+  print "  • whisper.cpp"
+  print ""
+  read "INSTALL_BREW?Install Homebrew now? (Y/n): "
+  INSTALL_BREW="${INSTALL_BREW:-Y}"
+
+  case "${INSTALL_BREW:l}" in
+    y|yes|o|oui)
+      print ""
+      print "→ Installing Homebrew using the official installer..."
+      print "  macOS may ask for your administrator password."
+      print ""
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+      setup_brew_path
+
+      if ! command -v brew >/dev/null 2>&1; then
+        print -u2 ""
+        print -u2 "Homebrew appears to be installed, but WhisperDrop could not find it in PATH."
+        print -u2 "Close and reopen Terminal, then rerun ./install.sh."
+        exit 1
+      fi
+
+      print ""
+      print "✓ Homebrew installed"
+      ;;
+    *)
+      print ""
+      print "Installation cancelled. Homebrew is required to continue."
+      print "You can install it later from https://brew.sh and rerun ./install.sh."
+      exit 1
+      ;;
+  esac
+else
+  print "✓ Homebrew detected: $(brew --prefix)"
 fi
 
 print "→ Installing dependencies (ffmpeg, whisper-cpp)..."
 brew list ffmpeg >/dev/null 2>&1 || brew install ffmpeg
 brew list whisper-cpp >/dev/null 2>&1 || brew install whisper-cpp
+print "✓ Dependencies ready"
 
 print ""
 read "WATCH_DIR?Folder to watch [$DEFAULT_WATCH]: "
