@@ -33,7 +33,25 @@ load_config() {
 
 command_path() {
   local name="$1"
-  command -v "$name" 2>/dev/null || true
+  local found=""
+
+  found="$(command -v "$name" 2>/dev/null || true)"
+  if [[ -n "$found" ]]; then
+    print -r -- "$found"
+    return 0
+  fi
+
+  if [[ -x "/opt/homebrew/bin/$name" ]]; then
+    print -r -- "/opt/homebrew/bin/$name"
+    return 0
+  fi
+
+  if [[ -x "/usr/local/bin/$name" ]]; then
+    print -r -- "/usr/local/bin/$name"
+    return 0
+  fi
+
+  return 1
 }
 
 is_supported_extension() {
